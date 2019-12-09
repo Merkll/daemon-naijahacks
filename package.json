@@ -1,0 +1,26 @@
+{
+  "name": "watcher",
+  "version": "1.0.0",
+  "description": "## Team Daemon",
+  "main": "server.js",
+  "scripts": {
+    "start": "nodemon server.jjs",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Merkll/naijahacks-watcher.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Merkll/naijahacks-watcher/issues"
+  },
+  "homepage": "https://github.com/Merkll/naijahacks-watcher#readme",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.1"
+  }
+}
