@@ -1,12 +1,14 @@
 import express from 'express';
 import { config } from 'dotenv';
-import models, { connect } from './models';
-import seedDB from './seed';
+import models, { connect } from './database/models';
+import seedDB from './database/seed';
+import router from './routes';
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/v1', router);
 
 config();
 
@@ -27,7 +29,7 @@ app.get('/v1/users', async (req, res) => {
     console.log(error);
   }
 });
-
+/*
 app.post('/v1/register', async (req, res) => {
   const {
     firstName, lastName, phoneNumber, password,
@@ -51,7 +53,7 @@ app.post('/v1/register', async (req, res) => {
       error: 'an error occurred',
     });
   }
-});
+}); */
 
 const eraseDatabaseOnSync = true;
 

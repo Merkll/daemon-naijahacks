@@ -14,6 +14,9 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
   },
+  role: {
+    type: String,
+  },
 });
 
 userSchema.statics.findByPhone = async function findByPhone(phoneNumber) {
