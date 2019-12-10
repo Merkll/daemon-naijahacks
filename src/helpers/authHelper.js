@@ -20,7 +20,7 @@ const encryptString = (string) => {
    * @param {string} hashPassword
    * @returns {Boolean} True or False
    */
-const compareHashedString = (password, hashedString) => bcrypt.compareSync(password, hashedString);
+const stringMatchesHash = (string, hashedString) => bcrypt.compareSync(string, hashedString);
 
 /**
    * Gnerate Token
@@ -35,4 +35,4 @@ const generateToken = (id) => jwt.sign(
   { expiresIn: '7h' },
 );
 
-export { encryptString, compareHashedString, generateToken };
+export { encryptString, stringMatchesHash, generateToken };

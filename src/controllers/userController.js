@@ -1,10 +1,10 @@
 import Model from '../database/models';
-import { encryptString, generateToken } from '../helpers/authHelper';
+import { encryptString, stringMatchesHash, generateToken } from '../helpers/authHelper';
 import { successResponse, errorResponse } from '../helpers/serverResponse';
 
 const { User } = Model;
 
-const signUp = async (req, res) => {
+const register = async (req, res) => {
   try {
     const foundUser = await User.findByPhone(req.body.phoneNumber);
 
@@ -20,7 +20,6 @@ const signUp = async (req, res) => {
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      password: undefined,
       role: user.role,
     };
 
@@ -30,4 +29,31 @@ const signUp = async (req, res) => {
   }
 };
 
-export default signUp;
+
+const login = async (req, res) => {
+  const { phoneNumber, password } = req.body;
+  try {
+    const user = await User.findByPhone(phoneNumber);
+
+    if (!user) {
+      return errorResponse(res, 400, 'Incorrect phone number of password');
+    }
+
+    if (!stringMatchesHash(password, user.password)) {
+      return errorResponse(res, 400, 'Incorrect phone number of password');
+    }
+
+    const token = generateToken(user._id);
+
+    const data = {
+      id: user._id,
+      phoneNumber: user.phoneNumber,
+    };
+
+    return successResponse(res, 201, data, 'login successful', token);
+  } catch (error) {
+    return errorResponse(res, 500, error);
+  }
+};
+
+export { login, register };
