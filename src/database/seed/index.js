@@ -6,6 +6,7 @@ const seedDB = async () => {
     lastName: 'solo',
     phoneNumber: '07031844444',
     password: 'uncracked',
+    role: 'admin',
   });
 
   const contact1 = new models.Contact({
