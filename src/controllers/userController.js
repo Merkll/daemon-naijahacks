@@ -1,5 +1,6 @@
 import Model from '../database/models';
 import { encryptString, stringMatchesHash, generateToken } from '../helpers/authHelper';
+import { sendVerification, checkVerificationCode } from '../middleware/authorize';
 import { successResponse, errorResponse } from '../helpers/serverResponse';
 
 const { User } = Model;
@@ -12,6 +13,7 @@ const register = async (req, res) => {
       return errorResponse(res, 400, 'User with phone number already exists');
     }
 
+    sendVerification('+2347031841489');
     const user = await Model.User.create({ ...req.body, password: encryptString(req.body.password), role: 'user' });
     const token = generateToken(user._id);
 
@@ -56,4 +58,9 @@ const login = async (req, res) => {
   }
 };
 
-export { login, register };
+const verifyOTP = async (req, res) => {
+  const { otp } = req.query;
+  checkVerificationCode();
+};
+
+export { login, register, verifyOTP };
