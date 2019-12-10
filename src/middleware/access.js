@@ -11,11 +11,7 @@ const verifyToken = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.SECRET_STRING);
       const user = await Model.User.findById(decoded.id);
       if (user) {
-        req.user = {
-          id: user.id,
-          phoneNumber: user.phoneNumber,
-          role: user.role,
-        };
+        req.user = user;
 
         next();
       } else errorResponse(res, 404, authorizationErrorMessage);
