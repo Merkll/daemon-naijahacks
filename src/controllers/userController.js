@@ -30,82 +30,86 @@ const register = async (req, res) => {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       verified: user.verified,
-      password: undefined,
     };
 
-    return successResponse(res, 201, data, 'Registration successful. A confirmation code has been seent to your phone number');
+    return successResponse(res, 201, data, 'Registration successful. A verification code has been sent to your phone number');
   } catch (error) {
-    return errorResponse(res, 500, error);
+    console.error(error);
+
+    return errorResponse(res, 500, 'An error occured');
   }
 };
 
 
 const login = async (req, res) => {
-  const { phoneNumber, password } = req.body;
+  const { phoneNumber } = req.body;
   try {
     const user = await User.findByPhone(phoneNumber);
 
     if (!user) {
-      return errorResponse(res, 400, 'Incorrect phone number or password');
+      return errorResponse(res, 400, 'Incorrect phone number');
     }
 
     if (!user.verified) {
-      return errorResponse(res, 401, 'Kindly verify your account');
+      return errorResponse(res, 401, 'Kindly verify your phone number');
     }
 
-    if (!stringMatchesHash(password, user.password)) {
-      return errorResponse(res, 400, 'Incorrect phone number or password');
-    }
+    sendVerification(req.body.phoneNumber);
 
-    const token = generateToken(user._id);
-
-    const data = {
-      id: user._id,
-      phoneNumber: user.phoneNumber,
-    };
-
-    return successResponse(res, 201, data, 'login successful', token);
+    return successResponse(res, 200, undefined, 'A verification code has been sent to your phone number');
   } catch (error) {
-    return errorResponse(res, 500, error);
+    console.error(error);
+
+    return errorResponse(res, 500, 'An error occured');
   }
 };
 
 const verifyOTP = async (req, res) => {
-  const { otp, phoneNumber } = req.query;
+  const { otp, phoneNumber, action } = req.query;
   const user = await Model.User.findByPhone(phoneNumber);
 
+  if (!user) {
+    return errorResponse(res, 400, 'Incorrect phone number');
+  }
 
-  nexmo.verify.check({
-    request_id: user.verificationId,
-    code: otp,
-  }, async (err, result) => {
-    if (err) {
-      console.error(err);
-      return errorResponse(res, 400, 'Error verifying phone ***');
-    }
+  if (action === 'resend') {
+    sendVerification(phoneNumber);
+    return successResponse(res, 200, 'success', 'A verification code has been sent.');
+  }
 
-    if (result.status === '0') {
-      try {
-        await Model.User.findOneAndUpdate({
-          phoneNumber,
-        }, {
-          $set: {
-            verificationId: '',
-            verified: true,
-          },
-        }, { returnNewDocument: true });
-
-        const token = generateToken(user._id);
-        return successResponse(res, 200, 'success', 'Verified successfully', token);
-      } catch (error) {
-        console.error(error);
-        return errorResponse(res, 500, 'Something went wrong');
+  if (action === 'verify') {
+    nexmo.verify.check({
+      request_id: user.verificationId,
+      code: otp,
+    }, async (err, result) => {
+      if (err) {
+        console.error(err);
+        return errorResponse(res, 400, 'Error verifying phone ***');
       }
-    } else {
-      console.log(result);
-      return errorResponse(res, 400, 'Error verifying phone number');
-    }
-  });
+
+      if (result.status === '0') {
+        try {
+          await Model.User.findOneAndUpdate({
+            phoneNumber,
+          }, {
+            $set: {
+              verificationId: '',
+              verified: true,
+            },
+          }, { returnNewDocument: true });
+
+          const token = generateToken(user._id);
+          return successResponse(res, 200, 'success', 'Verified successfully', token);
+        } catch (error) {
+          console.error(error);
+          return errorResponse(res, 500, 'Something went wrong');
+        }
+      } else {
+        console.log(result);
+        return errorResponse(res, 400, 'Error verifying phone number');
+      }
+    });
+  }
 };
 
 /*

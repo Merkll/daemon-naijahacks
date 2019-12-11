@@ -7,6 +7,6 @@ const authRoute = '/auth';
 
 auth.post(`${authRoute}/register`, register);
 auth.post(`${authRoute}/login`, login);
-auth.get(`${authRoute}/verify-otp`, verifyOTP);
+auth.get(`${authRoute}/otp`, verifyOTP);
 
 export default auth;
