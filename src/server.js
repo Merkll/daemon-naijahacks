@@ -29,33 +29,9 @@ app.get('/v1/users', async (req, res) => {
     console.log(error);
   }
 });
-/*
-app.post('/v1/register', async (req, res) => {
-  const {
-    firstName, lastName, phoneNumber, password,
-  } = req.body;
-  console.log(firstName);
-  try {
-    const user = await models.User.create({
-      firstName,
-      lastName,
-      phoneNumber,
-      password,
-    });
-    return res.status(201).json({
-      message: 'user registered succesfully',
-      user,
-    });
-  } catch (error) {
-    console.log(error);
 
-    return res.status(500).json({
-      error: 'an error occurred',
-    });
-  }
-}); */
-
-const eraseDatabaseOnSync = true;
+const eraseDatabaseOnSync = false;
+// const eraseDatabaseOnSync = true;
 
 connect().then(async () => {
   if (eraseDatabaseOnSync) {
