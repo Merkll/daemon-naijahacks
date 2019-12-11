@@ -1,6 +1,6 @@
 import Model from '../database/models';
 import { encryptString, stringMatchesHash, generateToken } from '../helpers/authHelper';
-import { sendVerification, checkVerificationCode } from '../middleware/authorize';
+import { nexmo, sendVerification } from '../services/otpService';
 import { successResponse, errorResponse } from '../helpers/serverResponse';
 
 const { User } = Model;
@@ -13,19 +13,27 @@ const register = async (req, res) => {
       return errorResponse(res, 400, 'User with phone number already exists');
     }
 
-    sendVerification('+2347031841489');
-    const user = await Model.User.create({ ...req.body, password: encryptString(req.body.password), role: 'user' });
-    const token = generateToken(user._id);
+    const {
+      firstName,
+      lastName,
+      phoneNumber,
+    } = req.body;
+
+    const user = await Model.User.create({
+      firstName, lastName, phoneNumber,
+    });
+    sendVerification(req.body.phoneNumber);
 
     const data = {
       id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
-      role: user.role,
+      verified: user.verified,
+      password: undefined,
     };
 
-    return successResponse(res, 201, data, 'registration successful', token);
+    return successResponse(res, 201, data, 'Registration successful. A confirmation code has been seent to your phone number');
   } catch (error) {
     return errorResponse(res, 500, error);
   }
@@ -38,11 +46,15 @@ const login = async (req, res) => {
     const user = await User.findByPhone(phoneNumber);
 
     if (!user) {
-      return errorResponse(res, 400, 'Incorrect phone number of password');
+      return errorResponse(res, 400, 'Incorrect phone number or password');
+    }
+
+    if (!user.verified) {
+      return errorResponse(res, 401, 'Kindly verify your account');
     }
 
     if (!stringMatchesHash(password, user.password)) {
-      return errorResponse(res, 400, 'Incorrect phone number of password');
+      return errorResponse(res, 400, 'Incorrect phone number or password');
     }
 
     const token = generateToken(user._id);
@@ -59,8 +71,45 @@ const login = async (req, res) => {
 };
 
 const verifyOTP = async (req, res) => {
-  const { otp } = req.query;
-  checkVerificationCode();
+  const { otp, phoneNumber } = req.query;
+  const user = await Model.User.findByPhone(phoneNumber);
+
+
+  nexmo.verify.check({
+    request_id: user.verificationId,
+    code: otp,
+  }, async (err, result) => {
+    if (err) {
+      console.error(err);
+      return errorResponse(res, 400, 'Error verifying phone ***');
+    }
+
+    if (result.status === '0') {
+      try {
+        await Model.User.findOneAndUpdate({
+          phoneNumber,
+        }, {
+          $set: {
+            verificationId: '',
+            verified: true,
+          },
+        }, { returnNewDocument: true });
+
+        const token = generateToken(user._id);
+        return successResponse(res, 200, 'success', 'Verified successfully', token);
+      } catch (error) {
+        console.error(error);
+        return errorResponse(res, 500, 'Something went wrong');
+      }
+    } else {
+      console.log(result);
+      return errorResponse(res, 400, 'Error verifying phone number');
+    }
+  });
 };
+
+/*
+  TODO: add endpoint for resending OTP
+ */
 
 export { login, register, verifyOTP };
