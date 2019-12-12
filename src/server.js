@@ -30,8 +30,8 @@ app.get('/v1/users', async (req, res) => {
   }
 });
 
-const eraseDatabaseOnSync = false;
-// const eraseDatabaseOnSync = true;
+// const eraseDatabaseOnSync = false;
+const eraseDatabaseOnSync = true;
 
 connect().then(async () => {
   if (eraseDatabaseOnSync) {

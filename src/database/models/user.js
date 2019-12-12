@@ -33,10 +33,14 @@ const userSchema = new mongoose.Schema({
 });
 
 userSchema.statics.findByPhone = async function findByPhone(phoneNumber) {
-  const user = await this.findOne({
-    phoneNumber,
-  });
-  return user;
+  try {
+    const user = await this.findOne({
+      phoneNumber,
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
 };
 
 userSchema.pre('remove', function cascade(next) {

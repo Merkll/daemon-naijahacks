@@ -1,23 +1,27 @@
 import Model from '../database/models';
-import { encryptString, stringMatchesHash, generateToken } from '../helpers/authHelper';
+import generateToken from '../helpers/authHelper';
 import { nexmo, sendVerification } from '../services/otpService';
 import { successResponse, errorResponse } from '../helpers/serverResponse';
 
 const { User } = Model;
 
+const verificationMessage = 'A verification code has been sent to your phone number';
+const verificationError = 'Error verifying phone number';
+
 const register = async (req, res) => {
+  const {
+    firstName,
+    lastName,
+    phoneNumber,
+  } = req.body;
+
   try {
-    const foundUser = await User.findByPhone(req.body.phoneNumber);
+    const foundUser = await User.findByPhone(phoneNumber);
 
     if (foundUser) {
-      return errorResponse(res, 400, 'User with phone number already exists');
+      sendVerification(phoneNumber);
+      return successResponse(res, 200, undefined, verificationMessage);
     }
-
-    const {
-      firstName,
-      lastName,
-      phoneNumber,
-    } = req.body;
 
     const user = await Model.User.create({
       firstName, lastName, phoneNumber,
@@ -32,7 +36,7 @@ const register = async (req, res) => {
       verified: user.verified,
     };
 
-    return successResponse(res, 201, data, 'Registration successful. A verification code has been sent to your phone number');
+    return successResponse(res, 201, data, `Registration successful. ${verificationMessage}`);
   } catch (error) {
     console.error(error);
 
@@ -50,13 +54,9 @@ const login = async (req, res) => {
       return errorResponse(res, 400, 'Incorrect phone number');
     }
 
-    if (!user.verified) {
-      return errorResponse(res, 401, 'Kindly verify your phone number');
-    }
+    sendVerification(phoneNumber);
 
-    sendVerification(req.body.phoneNumber);
-
-    return successResponse(res, 200, undefined, 'A verification code has been sent to your phone number');
+    return successResponse(res, 200, undefined, verificationMessage);
   } catch (error) {
     console.error(error);
 
@@ -66,7 +66,15 @@ const login = async (req, res) => {
 
 const verifyOTP = async (req, res) => {
   const { otp, phoneNumber, action } = req.query;
-  const user = await Model.User.findByPhone(phoneNumber);
+
+  let user;
+
+  try {
+    user = await Model.User.findByPhone(phoneNumber);
+  } catch (error) {
+    console.error(error);
+  }
+
 
   if (!user) {
     return errorResponse(res, 400, 'Incorrect phone number');
@@ -74,7 +82,7 @@ const verifyOTP = async (req, res) => {
 
   if (action === 'resend') {
     sendVerification(phoneNumber);
-    return successResponse(res, 200, 'success', 'A verification code has been sent.');
+    return successResponse(res, 200, 'success', verificationMessage);
   }
 
   if (action === 'verify') {
@@ -84,7 +92,7 @@ const verifyOTP = async (req, res) => {
     }, async (err, result) => {
       if (err) {
         console.error(err);
-        return errorResponse(res, 400, 'Error verifying phone ***');
+        return errorResponse(res, 400, verificationError);
       }
 
       if (result.status === '0') {
@@ -106,7 +114,7 @@ const verifyOTP = async (req, res) => {
         }
       } else {
         console.log(result);
-        return errorResponse(res, 400, 'Error verifying phone number');
+        return errorResponse(res, 400, verificationError);
       }
     });
   }
