@@ -7,7 +7,7 @@ const user1 = {
   _id: uid1,
   firstName: 'Han',
   lastName: 'solo',
-  phoneNumber: '2347031844444',
+  phoneNumber: '2348022658730',
   verified: true,
   verificationId: '',
   role: 'admin',
