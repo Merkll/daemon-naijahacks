@@ -1,13 +1,12 @@
 import { Schema, model } from 'mongoose';
 
-const messageSchema = new Schema({
-  content: {
+const locationShema = new Schema({
+  home: {
     type: String,
     required: true,
   },
-  category: {
+  work: {
     type: String,
-    required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
@@ -15,6 +14,6 @@ const messageSchema = new Schema({
   },
 });
 
-const Message = model('Message', messageSchema);
+const Location = model('Location', locationShema);
 
-export default Message;
+export default Location;

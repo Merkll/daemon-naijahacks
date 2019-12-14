@@ -1,20 +1,23 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const contactSchema = new mongoose.Schema({
+const contactSchema = new Schema({
   name: {
     type: String,
-    unique: true,
   },
   phoneNumber: {
     type: String,
     unique: true,
   },
+  contactType: {
+    type: String,
+    default: 'faf',
+  },
   user: {
-    type: mongoose.Schema.Types.ObjectId,
+    type: Schema.Types.ObjectId,
     ref: 'User',
   },
 });
 
-const Contact = mongoose.model('Contact', contactSchema);
+const Contact = model('Contact', contactSchema);
 
 export default Contact;
