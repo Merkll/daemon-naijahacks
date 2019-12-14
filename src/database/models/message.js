@@ -13,6 +13,10 @@ const messageSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: 'User',
   },
+  contact: {
+    type: Schema.Types.ObjectId,
+    ref: 'Contact',
+  },
 });
 
 const Message = model('Message', messageSchema);
