@@ -122,8 +122,20 @@ const verifyOTP = async (req, res) => {
   }
 };
 
-/*
-  TODO: add endpoint for resending OTP
- */
 
-export { login, register, verifyOTP };
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export {
+  login, register, verifyOTP, getUsers,
+};

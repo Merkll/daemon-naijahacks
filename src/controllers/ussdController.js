@@ -4,7 +4,7 @@ const root = ('*', (req, res) => {
   res.send('Welcome to Watcher USSD');
 });
 
-const handleUssd = ('*', (req, res) => {
+const handleUssd = ('*', async (req, res) => {
   const { /* phoneNumber, */ text } = req.body;
 
   const defaultResponse = `What is your emergency?
@@ -24,25 +24,54 @@ const handleUssd = ('*', (req, res) => {
 
   const STATUS = 200;
 
-  const userId = 'HS1489';
+  const userId = 'HS1489'; /* TODO: dynamically generate on register */
 
   let response;
 
   if (!text) {
     response = `CON ${defaultResponse}`;
-  } else if (text === '1') {
+  } else if (text === '1' || text === '2' || text === '3') {
     response = `CON ${locationResponse}`;
   } else if (text === '1*1') {
     /* set location of to home */
-    sendEmergencyMessage(userId, 1, 1);
+    await sendEmergencyMessage(userId, 1, 'home');
     response = `END ${messageSentResponse}`;
   } else if (text === '1*2') {
+    await sendEmergencyMessage(userId, 1, 'work');
     response = `END ${messageSentResponse}`;
-  } else if (text === '1*3') {
+  } else if (text === '1*3' || text === '2*3' || text === '3*3') {
     response = `CON ${landMarkResponse}`;
   } else if (text.includes('1*3') && text.includes('LOC')) {
+    const sections = text.split('*');
+    const location = sections[sections.length - 1];
+    await sendEmergencyMessage(userId, 1, location);
     response = `END ${messageSentResponse}`;
-    console.log(text);
+  } else if (text === '2*1') {
+    /* set location of to home */
+    await sendEmergencyMessage(userId, 2, 'home');
+    response = `END ${messageSentResponse}`;
+  } else if (text === '2*2') {
+    /* set location of to home */
+    await sendEmergencyMessage(userId, 2, 'work');
+    response = `END ${messageSentResponse}`;
+  } else if (text.includes('2*3') && text.includes('LOC')) {
+    const sections = text.split('*');
+    const location = sections[sections.length - 1];
+    await sendEmergencyMessage(userId, 2, location);
+    response = `END ${messageSentResponse}`;
+  } else if (text === '3*1') {
+    /* set location of to home */
+    await sendEmergencyMessage(userId, 3, 'home');
+    response = `END ${messageSentResponse}`;
+  } else if (text === '3*2') {
+    /* set location of to home */
+    await sendEmergencyMessage(userId, 3, 'work');
+    response = `END ${messageSentResponse}`;
+  } else if (text.includes('3*3') && text.to().includes('LOC')) {
+    const sections = text.split('*');
+    const location = sections[sections.length - 1];
+    await sendEmergencyMessage(userId, 3, location);
+    response = `END ${messageSentResponse}`;
   } else {
     response = `CON INVALID INPUT.
     ${defaultResponse}`;
