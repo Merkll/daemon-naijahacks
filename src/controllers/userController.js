@@ -1,6 +1,7 @@
 import Model from '../database/models';
 import generateToken from '../helpers/authHelper';
 import { nexmo, sendVerification } from '../services/otpService';
+import createUser from '../services/userService';
 import { successResponse, errorResponse } from '../helpers/serverResponse';
 
 const { User } = Model;
@@ -23,9 +24,10 @@ const register = async (req, res) => {
       return successResponse(res, 200, undefined, verificationMessage);
     }
 
-    const user = await Model.User.create({
+    const user = await createUser({
       firstName, lastName, phoneNumber,
     });
+
     sendVerification(req.body.phoneNumber);
 
     const data = {
@@ -120,8 +122,20 @@ const verifyOTP = async (req, res) => {
   }
 };
 
-/*
-  TODO: add endpoint for resending OTP
- */
 
-export { login, register, verifyOTP };
+const getUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export {
+  login, register, verifyOTP, getUsers,
+};
