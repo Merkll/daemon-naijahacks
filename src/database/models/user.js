@@ -1,6 +1,6 @@
-import mongoose from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-const userSchema = new mongoose.Schema({
+const userSchema = new Schema({
   firstName: {
     type: String,
     required: true,
@@ -14,10 +14,6 @@ const userSchema = new mongoose.Schema({
     unique: true,
     required: true,
   },
-  password: {
-    type: String,
-    default: '',
-  },
   verified: {
     type: Boolean,
     default: false,
@@ -29,6 +25,10 @@ const userSchema = new mongoose.Schema({
   role: {
     type: String,
     default: 'user',
+  },
+  ussdId: {
+    type: String,
+    unique: true,
   },
 });
 
@@ -47,6 +47,6 @@ userSchema.pre('remove', function cascade(next) {
   this.model('Contact').deleteMany({ user: this._id }, next);
 });
 
-const User = mongoose.model('User', userSchema);
+const User = model('User', userSchema);
 
 export default User;

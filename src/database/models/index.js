@@ -3,6 +3,7 @@ import { config } from 'dotenv';
 import User from './user';
 import Contact from './contact';
 import Message from './message';
+import Location from './location';
 
 config();
 
@@ -19,7 +20,9 @@ db.once('open', () => {
   console.log("we're connected!");
 });
 
-const models = { User, Contact, Message };
+const models = {
+  User, Contact, Message, Location,
+};
 
 export { connect };
 

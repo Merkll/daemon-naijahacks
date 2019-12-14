@@ -1,11 +1,13 @@
 import express from 'express';
+import logger from 'morgan';
 import { config } from 'dotenv';
 import models, { connect } from './database/models';
-import seedDB from './database/seed';
+import { seedUser, seedContact, seedLocation } from './database/seed';
 import router from './routes';
 
 const app = express();
 
+app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use('/v1', router);
@@ -30,6 +32,30 @@ app.get('/v1/users', async (req, res) => {
   }
 });
 
+app.get('/v1/contacts', async (req, res) => {
+  try {
+    const contacts = await models.Contact.find({}).populate('user');
+    res.json({
+      success: true,
+      contacts,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.get('/v1/locations', async (req, res) => {
+  try {
+    const locations = await models.Location.find({}).populate('user');
+    res.json({
+      success: true,
+      locations,
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
 // const eraseDatabaseOnSync = false;
 const eraseDatabaseOnSync = true;
 
@@ -39,8 +65,10 @@ connect().then(async () => {
       models.User.deleteMany({}),
       models.Contact.deleteMany({}),
       models.Message.deleteMany({}),
+      seedUser(),
+      seedContact(),
+      seedLocation(),
     ]);
-    seedDB();
   }
   app.listen(port, () => console.log(`Listening on port ${port}`));
 });
