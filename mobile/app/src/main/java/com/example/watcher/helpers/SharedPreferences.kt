@@ -10,7 +10,7 @@ class SharedPreferences(val activity: Activity) {
         fun config(activity: Activity) {
             authActivity = activity
         }
-        private fun getSharedPreference(): SharedPreferences? = authActivity?.getSharedPreferences("watcher", MODE_PRIVATE)
+        private fun getSharedPreference(): SharedPreferences = authActivity?.getSharedPreferences("watcher", MODE_PRIVATE) as SharedPreferences
         private fun getEditor(): SharedPreferences.Editor? = getSharedPreference()?.edit()
 
         fun setValue(key: String, value: String): String {
@@ -31,10 +31,10 @@ class SharedPreferences(val activity: Activity) {
             return value
         }
 
-        fun getValue(key: String, default: Boolean = true): Boolean? {
-            val pref: SharedPreferences? = getSharedPreference()
+        fun getValue(key: String, default: Boolean = true): Boolean {
+            val pref: SharedPreferences = getSharedPreference()
 
-            return pref?.getBoolean(key, default)
+            return pref.getBoolean(key, default)
         }
 
         fun getValue(key: String, default: String = ""): String? {

@@ -74,7 +74,7 @@ class BroadcastFragment : Fragment() {
         val broadcast = Broadcast.newBroadcast(emergencyText?.text.toString(), context as Context)
         Log.i("Broadcast", broadcast.toString())
 
-        SMS.send(broadcast.message)
+        SMS.send(broadcast.message, context as Context)
         adapter?.updateAdapter(getAllBroadcastList())
     }
 

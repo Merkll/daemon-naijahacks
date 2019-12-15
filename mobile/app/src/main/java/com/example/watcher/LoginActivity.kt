@@ -22,6 +22,7 @@ class LoginActivity : AppCompatActivity() {
         val phoneNumber = view.rootView.findViewById<EditText>(R.id.login_phone_number)
         Auth(this).loginUser(phoneNumber.text.toString(), {
             Log.i("Clicked success...", "clicked $it")
+            this.toast(it.get("message") as String)
             dialog.dismiss()
             startActivity(Intent(this, OTPActivity::class.java))
         }, {

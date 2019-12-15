@@ -37,10 +37,10 @@ class OTPActivity : AppCompatActivity() {
             Log.i("Clicked success...", "clicked $it")
             com.example.watcher.helpers.Auth.isLoggedIn = true
             dialog.dismiss()
-            com.example.watcher.helpers.Auth.isLoggedIn = true
             startActivity(Intent(this, DashboardActivity::class.java))
         }, {
             dialog.dismiss()
+            Log.i("Login error", "$it")
             this.toast("Could not verify your otp")
         })
     }

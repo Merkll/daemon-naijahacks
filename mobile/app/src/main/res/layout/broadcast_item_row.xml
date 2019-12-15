@@ -20,16 +20,17 @@
                 android:id="@+id/current_date"
                 android:text="20/10/2019 2pm" app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-        />
+                android:textStyle="italic" android:textSize="12sp"/>
         <TextView
-                android:layout_width="257dp"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:inputType="textMultiLine"
                 android:gravity="start|top"
                 android:ems="10"
                 android:id="@+id/broadcast_message"
                 android:text="Please I am stranded at Abuja" app:layout_constraintTop_toBottomOf="@+id/current_date"
-                android:layout_marginTop="24dp" app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"/>
+                android:layout_marginTop="8dp" app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" android:textSize="12sp"
+                android:fontFamily="sans-serif-condensed-medium"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

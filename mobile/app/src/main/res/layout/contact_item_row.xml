@@ -20,7 +20,7 @@
                 android:id="@+id/display_name"
                 android:text="display name" app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-        />
+                android:textStyle="bold" android:fontFamily="sans-serif-condensed-medium"/>
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -29,6 +29,7 @@
                 android:ems="10"
                 android:id="@+id/user_phone_number"
                 android:text="@android:string/emptyPhoneNumber"
-                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"/>
+                app:layout_constraintEnd_toEndOf="parent" app:layout_constraintTop_toTopOf="parent"
+                android:fontFamily="sans-serif-condensed-light" android:textStyle="italic"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

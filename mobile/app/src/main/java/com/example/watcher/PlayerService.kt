@@ -4,6 +4,8 @@ import android.app.Activity
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.hardware.Sensor
+import android.hardware.SensorManager
 import android.os.IBinder
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
@@ -16,9 +18,13 @@ import com.example.watcher.helpers.SMS
 
 class PlayerService : Service() {
     private var mediaSession: MediaSessionCompat? = null
+
+
+
     override fun onCreate() {
         super.onCreate()
-        mediaSession = MediaSessionCompat(this, "PlayerService")
+        Log.i("PlayerService", "layerService")
+        mediaSession = MediaSessionCompat(this, "WatcherService")
         mediaSession!!.setFlags(
             MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS or
                     MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS
@@ -48,6 +54,7 @@ class PlayerService : Service() {
     }
 
     companion object {
+        private lateinit var sensorManager: SensorManager
         private var buttonPressedWhen: Long? = null
         private var numberOfTimesPressed: Int = 0
         private var previousButtonPressed: Int? =  null
@@ -99,7 +106,7 @@ class PlayerService : Service() {
             LocationService(appContext as Context, appActivity as Activity).getCurrentLocation { lat, long ->
                 val sosMessage = LocationService.getEmergencyMessage()
                 val location = LocationService.getLocationOnGoogleMap(lat, long)
-                SMS.send("$sosMessage checkout the location $location")
+                SMS.send("$sosMessage checkout the location $location", appContext as Context)
             }
     }
 }
